@@ -9,3 +9,105 @@ editor: visual
 Here we are in week 6 of the Summer R group and you've actually learned quite a lot.
 
 In this Quarto doc, I will step through all of the tasks asked of you on [this google document](https://docs.google.com/document/d/11-IKRdYxpTwPkJ_xSCvJ7QKmdgvnONgHCRn33OXU-IA/edit?usp=sharing).
+
+### Step 1
+
+1.  Create a new project in RStudio. **If you are learning the git/hub workflow, start by creating a new github repository and then create your RStudio project from it**.
+
+    -   Make a code folder and a data folder
+    -   Download `porcupine_arctos_search_7_July_2025.csv` to your computer and put it in the data folder for your project.
+    -   Start a new quarto document and save it to your code folder.
+
+### Step 2
+
+2.  Write some code at the start of your quarto doc to “set things up”. Consider code to clear the environment, and code to load the `tidyverse` set of packages and the `here` package.
+
+    -   Be sure to add text to your quarto doc to explain your purpose and comments to your code to explain its function.
+
+Here is that code:
+
+```{r}
+#| echo: false #tell's R not to print the code of this code chunk, only its output
+rm(list = ls()) #clears R's environment
+library(tidyverse) #loads all the tidyverse packages
+library(here) #loads the here package for path managment
+```
+
+### Step 3
+
+3.  Create a new data frame called `porcs` by reading in `porcupine_arctos_search_7_July_2025.csv` from the Data folder.
+
+Read in the file and name it "porcs"
+
+```{r}
+porcs <- read.csv(here("Data/porcupine_arctos_search_6_July_2025.csv"))
+```
+
+### Step 4
+
+4.  In [Session 1](https://drive.google.com/drive/folders/149lsHC2FsICLaVLQXgBEVtSzDgKiLPpH?usp=drive_link), we learned about some issues that might arise if a spreadsheet is not well organized for analysis. In addition to writing code to examine some basics about the data set (that we learned in [Session 3](https://drive.google.com/drive/folders/1nXL263605DwV0_TBSsDO4gYkTItUCv2-?usp=drive_link) and [Session 5](https://docs.google.com/document/d/1ZRFsHoer4YCHdMNxgU6_YdEQPRQjPZnMe1wSo_5lyKE/edit?usp=drive_link)), **beneath your code chunk identify and describe at least 2 problems with how these data were recorded that could have been avoided** by better organization of the spreadsheet in the first place.
+
+Here's the code to examine the dataset:
+
+```{r}
+str(porcs) #examine the structure of the dataset
+```
+
+Now look at the top and bottom 10 rows with `head` and `tail`
+
+```{r}
+head(porcs, 10) #show first 10 rows of data
+tail(porcs, 10) #show last 10 rows of data
+```
+
+Let's summarise the dataset:
+
+```{r}
+summary(porcs) #provides summary information for each column in the dataset
+```
+
+Let's just get the "spreadsheet" view of the data"
+
+```{r}
+View(porcs)
+```
+
+A few things to notice that are problems with these data:
+
+-   The original measurement data for this dataset included both the measurement and an indication of the units in the same column (e.g. `EAR_FROM_NOTCH`, `` HIND_FOOT_WITH_CLAW, `WEIGHT` ``), which breaks our rule of "one datum per cell". I created new columns for those measurement data and included the unit of measure in the column name, but only the actual measurment in each cell. I did it in excel, which violates the "reproducible research" rule, since there is no record of the steps I took.
+
+-   There are no metadata associated with this file. You can't tell the provenence of the data nor is there any official description of each column. You are left to figure these out on your own.
+
+### Step 5
+
+5.  Use what you learned in Session 5 to make a new dataset (name it whatever you like) that only includes the following columns:
+
+ROW_NUM, DEC_LAT, DEC_LONG, SPECIES, YEAR_COLLECTED, MONTH_COLLECTED, DAY_COLLECTED, AGE, EAR_LENGTH_MM, HIND_FOOT_W_CLAW_MM, SEX, TAIL_LENGTH_MM, TOTAL_LENGTH_MM, MASS_G
+
+(Hint: `select`…)
+
+Here's the code:
+
+```{r}
+porcs_small <- porcs %>% select(ROW_NUM, DEC_LAT, DEC_LONG, SPECIES, YEAR_COLLECTED, MONTH_COLLECTED, DAY_COLLECTED, AGE, EAR_LENGTH_MM, HIND_FOOT_W_CLAW_MM, SEX, TAIL_LENGTH_MM, TOTAL_LENGTH_MM, MASS_G)
+```
+
+### Step 6
+
+6.  Now that you have this smaller data set, use it to try out some of the `dplyr` functions we learned in Session 5. For example:
+
+    -   Try using `filter` to get just the female porcupines
+
+    -   Try using `group_by` and `summarize` to determine the mean body mass of these porcupines.
+
+    -   Can you use some combination of `filter`, `group_by` and `summarise` to determine the mean ear length of adult male porcupines?
+
+Nice job!
+
+### Something New
+
+Now that you have reviewed all of that, let’s look at some basic plotting in R. Taking a LOOK at your data before running any analyses helps you become more familiar with your data.
+
+\
+\
+\
