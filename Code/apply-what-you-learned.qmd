@@ -1,0 +1,11 @@
+---
+title: "Applying-what-you-have-learned"
+format: html
+editor: visual
+---
+
+## Applying what you've learned
+
+Here we are in week 6 of the Summer R group and you've actually learned quite a lot.
+
+In this Quarto doc, I will step through all of the tasks asked of you on [this google document](https://docs.google.com/document/d/11-IKRdYxpTwPkJ_xSCvJ7QKmdgvnONgHCRn33OXU-IA/edit?usp=sharing).
