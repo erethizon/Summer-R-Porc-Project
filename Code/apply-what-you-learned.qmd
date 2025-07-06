@@ -27,7 +27,6 @@ In this Quarto doc, I will step through all of the tasks asked of you on [this g
 Here is that code:
 
 ```{r}
-#| echo: false #tell's R not to print the code of this code chunk, only its output
 rm(list = ls()) #clears R's environment
 library(tidyverse) #loads all the tidyverse packages
 library(here) #loads the here package for path managment
@@ -66,7 +65,7 @@ Let's summarise the dataset:
 summary(porcs) #provides summary information for each column in the dataset
 ```
 
-Let's just get the "spreadsheet" view of the data"
+Let's just get the "spreadsheet" view of the data
 
 ```{r}
 View(porcs)
@@ -98,16 +97,111 @@ porcs_small <- porcs %>% select(ROW_NUM, DEC_LAT, DEC_LONG, SPECIES, YEAR_COLLEC
 
     -   Try using `filter` to get just the female porcupines
 
-    -   Try using `group_by` and `summarize` to determine the mean body mass of these porcupines.
+    ```{r}
+    porcs_small %>% #use piping; start with the dataset
+      filter(SEX == "female") %>% #filter to just the females
+      View() #look at the "spreadsheet view" of the data
+    ```
 
-    -   Can you use some combination of `filter`, `group_by` and `summarise` to determine the mean ear length of adult male porcupines?
+    -   Try using `group_by` and `summarize` to determine the mean hind foot with claw (in mm) of for male and female porcupines.
+
+This time, I will create a new object called `hind_foot_summary`, just for kicks. 
+
+    ```{r}
+hind_foot_summary <- porcs_small %>%  #create a new object by starting with the existing porcs_small object
+      group_by(SEX) %>% #group the data according to the values in the SEX column
+      summarise( 
+        mean_hind_foot_mm = mean(HIND_FOOT_W_CLAW_MM, na.rm = T) #create new variable mean_mass that takes the mean of the MASS_G column; na.rm = T tells R to ignore cells with no value for MASS_G
+      )
+    ```
+Or, let's use filter to subset to just known males and females:
+
+```{r}
+porcs_small %>% 
+  filter(SEX == "male" | SEX == "female") %>% #filter dataset to just known males and females
+  group_by(SEX) %>% #group according to sex
+  summarise(
+    mean_hind_foot_mm = mean(HIND_FOOT_W_CLAW_MM, na.rm = T)
+  )
+```
+
+    -   Can you use some combination of `filter`, `group_by` and `summarise` to determine the mean body mass of adult porcupines according to sex?
+
+
+Here's one way:
+```{r}
+porcs_small %>% 
+  filter(AGE == "adult") %>% #subset the data for just adults
+  group_by(SEX) %>% #group data according to sex
+  summarise(
+    mean_body_mass_g = mean(MASS_G, na.rm = T)
+  )
+```
+ 
+ Why do you think you got NaN for females?
 
 Nice job!
 
 ### Something New
 
+Here’s a new function, n(), that let’s you count things. Let’s use it to count the number of porcupines in each age class/sex combination in the smaller dataset. 
+
+```{r}
+porcs_small %>% 
+  group_by(SEX, AGE) %>% 
+  summarise(
+    count = n()
+  )
+```
+
+### Plotting
+
 Now that you have reviewed all of that, let’s look at some basic plotting in R. Taking a LOOK at your data before running any analyses helps you become more familiar with your data.
 
-\
-\
-\
+
+#### Histograms
+Let's plot a histogram of EAR_LENGTH_MM
+
+```{r}
+ggplot(porcs_small, aes(EAR_LENGTH_MM))+ #make a plot; use the porcs_small dataset and choose EAR_LENGTH_MM as the X variable
+  geom_histogram() #plot a histogram of the X variable
+```
+
+Here's a slightly different version that changes width of the histogram bins and calls the plot using piping
+
+```{r}
+porcs_small %>% #call the porcs_small dataset
+  ggplot(aes(EAR_LENGTH_MM))+ #make a plot; choose EAR_LENGTH_MM as the X variable
+  geom_histogram(bins = 50) #plot a histogram of the X variable with 50 rather than the default 30 bins
+```
+What if we wanted to look at the relationship between Hind foot length and body mass in female porcupines?
+
+```{r}
+porcs_small %>% 
+  ggplot(aes(x = HIND_FOOT_W_CLAW_MM, y = MASS_G)) + 
+  geom_point()
+```
+Do porcupines with longer tails weigh more?
+
+```{r}
+ggplot(porcs_small, aes(x = MASS_G, y = TAIL_LENGTH_MM)) +
+  geom_point()
+```
+Now let's make it fancier!
+```{r}
+porcs_small %>% #use the porcs_small dataset
+  ggplot( #create a plot
+    aes(x = MASS_G, #determine x variable
+        y = TAIL_LENGTH_MM, #determine y variable
+        group = SEX, #assign grouping variable
+        color = SEX ) #assign variable for coloring plot
+  ) +
+  geom_point(size = 4)+ #make a scatter plot; increase size of points
+  labs(#assign plot labels
+    title = "my plot", #add a title to the plot
+    x = "Body mass (g)", #x-axis label
+    y = "Tail length (mm)" #y-axis label
+  ) +
+    theme_bw() #turn on the built-in black and white theme
+```
+
