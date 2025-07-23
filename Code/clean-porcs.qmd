@@ -1,0 +1,36 @@
+---
+title: "clean-porcs"
+format: html
+editor: visual
+---
+
+## Let's clean the porcupine data set
+
+Here is that code:
+
+```{r}
+rm(list = ls()) #clears R's environment
+library(tidyverse) #loads all the tidyverse packages
+library(here) #loads the here package for path managment
+porcs <- read.csv(here("Data/porcupine_arctos_search_6_July_2025.csv"))
+```
+
+Subset to some columns to use in demonstrating regression
+
+```{r}
+porcs <-
+  porcs |> 
+    select(ROW_NUM, DEC_LAT, DEC_LONG, SPECIES, YEAR_COLLECTED, MONTH_COLLECTED, DAY_COLLECTED, EAR_LENGTH_MM, HIND_FOOT_W_CLAW_MM, TAIL_LENGTH_MM, TOTAL_LENGTH_MM, MASS_G)
+```
+Reduce to just the complete cases
+
+```{r}
+porcs_complete <- porcs[complete.cases(porcs), ]
+```
+
+Now save the result
+
+```{r}
+write_csv(porcs_complete, here("Data/porcs_complete.csv"))
+```
+
